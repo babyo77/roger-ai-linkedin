@@ -38,11 +38,11 @@ export const getConnection = async (req: Request, res: Response) => {
         const status =
           card.querySelector(".artdeco-button__text")?.textContent?.trim() ||
           "";
-        const imageUrl =
-          card
-            .querySelector(".invitation-card__picture img")
-            ?.getAttribute("src") || "";
-        return { name, status, imageUrl };
+        // const imageUrl =
+        //   card
+        //     .querySelector(".invitation-card__picture img")
+        //     ?.getAttribute("src") || "";
+        return { name, status };
       });
     });
     // await randomScroll(page);
