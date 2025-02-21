@@ -4,9 +4,9 @@ import { Request, Response } from "express";
 import { INITIALIZE_BROWSER } from "../playwright.config";
 
 const initiateConnection = async (page: Page, message: string) => {
-  await randomDelay();
+  //   await randomDelay();
 
-  await delay(page);
+  //   await delay(page);
   try {
     let connect = await page.locator(
       "xpath=/html/body/div[6]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/button"
@@ -41,9 +41,9 @@ const initiateConnection = async (page: Page, message: string) => {
   await delay(page);
   await addNoteButton?.click();
 
-  // Sometimes scroll slightly before typing
-  await randomScroll(page);
-  await randomDelay();
+  //   // Sometimes scroll slightly before typing
+  //   await randomScroll(page);
+  //   await randomDelay();
 
   // Type message with human-like delays
   const messageInput = await page.locator(
