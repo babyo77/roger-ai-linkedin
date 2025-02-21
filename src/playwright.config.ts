@@ -22,23 +22,23 @@ export const PLAYWRIGHT_CONFIG: {
 
 export const BROWSER_CONFIG = {
   headless: true,
-  args: [
-    "--no-sandbox",
-    "--disable-setuid-sandbox",
-    "--disable-dev-shm-usage",
-    "--disable-accelerated-2d-canvas",
-    "--disable-gpu",
-    "--disable-blink-features=AutomationControlled",
-    "--enable-webgl",
-    // Add these args to mask automation
-    "--disable-features=site-per-process",
-    "--disable-blink-features",
-    "--disable-infobars",
-    "--window-position=0,0",
-    "--ignore-certifcate-errors",
-    "--ignore-certifcate-errors-spki-list",
-    `--window-size=${getRandomViewport().width},${getRandomViewport().height}`,
-  ],
+  // args: [
+  //   "--no-sandbox",
+  //   "--disable-setuid-sandbox",
+  //   "--disable-dev-shm-usage",
+  //   "--disable-accelerated-2d-canvas",
+  //   "--disable-gpu",
+  //   "--disable-blink-features=AutomationControlled",
+  //   "--enable-webgl",
+  //   // Add these args to mask automation
+  //   "--disable-features=site-per-process",
+  //   "--disable-blink-features",
+  //   "--disable-infobars",
+  //   "--window-position=0,0",
+  //   "--ignore-certifcate-errors",
+  //   "--ignore-certifcate-errors-spki-list",
+  //   `--window-size=${getRandomViewport().width},${getRandomViewport().height}`,
+  // ],
   ignoreDefaultArgs: ["--enable-automation"],
   ignoreHTTPSErrors: true,
 };
@@ -54,23 +54,21 @@ export const INITIALIZE_BROWSER = async (req: Request) => {
 
   const context = await browser.newContext(PLAYWRIGHT_CONFIG);
 
-  await context.addInitScript(() => {
-    Object.defineProperty(navigator, "webdriver", {
-      get: () => undefined,
-    });
-    // @ts-ignore
-    window.navigator.chrome = {
-      runtime: {},
-    };
-  });
-
-  await context.addCookies([
-    {
-      name: "li_at",
-      value: token,
-      domain: ".linkedin.com",
-      path: "/",
-    },
+  await Promise.all([
+    context.addInitScript(() => {
+      Object.defineProperty(navigator, "webdriver", {
+        get: () => undefined,
+      });
+    }),
+    await context.addCookies([
+      {
+        name: "li_at",
+        value: token,
+        domain: ".linkedin.com",
+        path: "/",
+      },
+    ]),
   ]);
+
   return { browser, context };
 };
