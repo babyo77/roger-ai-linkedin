@@ -13,19 +13,19 @@ export const getConnection = async (req: Request, res: Response) => {
       }
     );
 
-    await Promise.allSettled([
-      (async () => {
-        await randomMouseMove(page);
-        if (Math.random() > 0.7) {
-          await page.hover(".invitation-card__picture");
-        }
-      })(),
-      (async () => {
-        await randomScroll(page);
-      })(),
-    ]);
+    // await Promise.allSettled([
+    //   (async () => {
+    //     await randomMouseMove(page);
+    //     if (Math.random() > 0.7) {
+    //       await page.hover(".invitation-card__picture");
+    //     }
+    //   })(),
+    //   (async () => {
+    //     await randomScroll(page);
+    //   })(),
+    // ]);
 
-    await delay(page);
+    // await delay(page);
 
     const newConnections = await page.$$eval(".invitation-card", (cards) => {
       return cards.map((card) => {
@@ -45,7 +45,7 @@ export const getConnection = async (req: Request, res: Response) => {
         return { name, status, imageUrl };
       });
     });
-    await randomScroll(page);
+    // await randomScroll(page);
 
     return res.status(200).json({ connections: Array.from(newConnections) });
   } finally {
