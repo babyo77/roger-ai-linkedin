@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import router from "./router/route";
 import { AppError } from "./middleware/asyncHandler";
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 9000;
 dotenv.config();
 const app = express();
 

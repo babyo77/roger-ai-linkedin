@@ -21,7 +21,7 @@ COPY src/ ./src/
 RUN npm run build
 
 # Expose the port your application uses (matches your index.ts)
-EXPOSE 4000
+EXPOSE 9000
 
 # Start the application using the compiled JavaScript
 CMD ["node", "dist/index.js"]
