@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  roger-linkedin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: roger-linkedin
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      # Add other environment variables as needed
+    volumes:
+      # Volume for persistent browser data
+      - playwright-data:/app/.cache/ms-playwright
+    restart: unless-stopped
+    # Resource limits to prevent browser automation from consuming too much
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+
+volumes:
+  playwright-data:
+    name: roger-linkedin-playwright-data 
