@@ -1,0 +1,89 @@
+{
+  "info": {
+    "name": "Roger LinkedIn API",
+    "description": "API collection for Roger LinkedIn Automation",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Send Connection Request",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "li_at",
+            "value": "{{li_at}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/send-connection?linkedinUrl=https://linkedin.com/in/username&message=Hi, let's connect!",
+          "host": ["{{base_url}}"],
+          "path": ["api", "send-connection"],
+          "query": [
+            {
+              "key": "linkedinUrl",
+              "value": "https://linkedin.com/in/username"
+            },
+            {
+              "key": "message",
+              "value": "Hi, let's connect!"
+            }
+          ]
+        },
+        "description": "Send a connection request to a LinkedIn profile"
+      }
+    },
+    {
+      "name": "Get Pending Connections",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "li_at",
+            "value": "{{li_at}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/connections",
+          "host": ["{{base_url}}"],
+          "path": ["api", "connections"]
+        },
+        "description": "Get list of pending connections"
+      }
+    },
+    {
+      "name": "Get User Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "li_at",
+            "value": "{{li_at}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/me",
+          "host": ["{{base_url}}"],
+          "path": ["api", "me"]
+        },
+        "description": "Get current user's profile information"
+      }
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://98.70.32.247:9000",
+      "type": "string"
+    },
+    {
+      "key": "li_at",
+      "value": "your_linkedin_token_here",
+      "type": "string"
+    }
+  ]
+}
