@@ -13,7 +13,7 @@ export const getUser = async (req: Request, res: Response) => {
       waitUntil: "domcontentloaded",
     });
 
-    await randomMouseMove(page);
+    // await randomMouseMove(page);
 
     const profileLink = page
       .locator(
@@ -25,7 +25,7 @@ export const getUser = async (req: Request, res: Response) => {
     if (!name) {
       throw new AppError("Failed to fetch LinkedIn profile", 500);
     }
-    await randomDelay();
+    // await randomDelay();
 
     return res.status(200).json({ name });
   } catch (error: any) {
