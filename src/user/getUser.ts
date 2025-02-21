@@ -10,7 +10,7 @@ export const getUser = async (req: Request, res: Response) => {
 
   try {
     await page.goto("https://www.linkedin.com/in/", {
-      waitUntil: "domcontentloaded",
+      waitUntil: "networkidle",
     });
 
     // await randomMouseMove(page);
