@@ -10,6 +10,9 @@ const app = express();
 
 app.use(cors());
 
+app.get("/", (req: Request, res: Response) => {
+  res.send("linkedin api is running");
+});
 app.use("/api", router);
 
 app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
