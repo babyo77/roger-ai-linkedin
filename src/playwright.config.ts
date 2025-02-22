@@ -11,14 +11,14 @@ import { Request } from "express";
 
 export const PLAYWRIGHT_CONFIG: {
   userAgent: string;
-  viewport: { width: number; height: number };
+  // viewport: { width: number; height: number };
   deviceScaleFactor: number;
   colorScheme: "dark" | "light";
   reducedMotion: "reduce" | "no-preference";
   isMobile: boolean;
 } = {
   userAgent: getRandomUserAgent(),
-  viewport: getRandomViewport(),
+  // viewport: getRandomViewport(),
   isMobile: false,
   deviceScaleFactor: Math.random() * (2 - 1) + 1,
   colorScheme: Math.random() > 0.5 ? "dark" : "light",

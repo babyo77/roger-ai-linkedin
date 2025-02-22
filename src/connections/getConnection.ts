@@ -17,55 +17,64 @@ export const getConnection = async (req: Request, res: Response) => {
       timeout: 10000,
     });
 
-    const newConnections = await page.$$eval(
-      ".artdeco-list .invitation-card",
-      (cards) => {
-        return cards.map((card) => {
-          // Get name - handle nested strong/a tags
-          const nameElement = card.querySelector(
-            ".invitation-card__tvm-title strong a"
-          );
-          const name = nameElement?.textContent?.trim() || "";
+    let previousHeight = 0;
+    let allConnections = new Set();
 
-          // Get status from the withdraw button
-          const status =
-            card.querySelector(".artdeco-button__text")?.textContent?.trim() ||
-            "";
+    while (true) {
+      const newConnections = await page.$$eval(
+        ".artdeco-list .invitation-card",
+        (cards) =>
+          cards.map((card) => {
+            const nameEl = card.querySelector(
+              ".invitation-card__details .invitation-card__tvm-title strong a:last-child"
+            );
+            const imageEl = card.querySelector(".invitation-card__picture img");
+            const subtitleEl = card.querySelector(".invitation-card__subtitle");
+            const timeEl = card.querySelector(".time-badge");
 
-          // Get profile link
-          const profileLink =
-            card
-              .querySelector(".invitation-card__picture")
-              ?.getAttribute("href") || "";
+            return {
+              name: nameEl?.textContent?.trim() || "",
+              profileUrl: (nameEl as HTMLAnchorElement)?.href || "",
+              imageUrl: imageEl?.getAttribute("src") || "",
+              subtitle: subtitleEl?.textContent?.trim() || "",
+              time: timeEl?.textContent?.trim() || "",
+            };
+          })
+      );
 
-          // Get subtitle with cleaner text
-          const subtitle =
-            card
-              .querySelector(".invitation-card__subtitle")
-              ?.textContent?.replace(/<!---->|<!---->/g, "")
-              ?.trim() || "";
+      newConnections.forEach((conn) =>
+        allConnections.add(JSON.stringify(conn))
+      );
 
-          // Get time sent
-          const timeSent =
-            card.querySelector(".time-badge")?.textContent?.trim() || "";
+      const currentHeight = await page.evaluate(
+        () => document.documentElement.scrollHeight
+      );
+      if (currentHeight === previousHeight) {
+        break; // No new content loaded
+      }
 
-          return {
-            name,
-            status,
-            profileLink,
-            subtitle,
-            timeSent,
-          };
-        });
+      previousHeight = currentHeight;
+      await page.evaluate(() =>
+        window.scrollTo(0, document.documentElement.scrollHeight)
+      );
+      await page.waitForTimeout(1000); // Wait for content to load
+    }
+
+    const totalInvitations = await page.$eval(
+      "#mn-invitation-manager__invitation-facet-pills--CONNECTION .artdeco-pill__text",
+      (el) => {
+        const match = el.textContent?.match(/People \((\d+)\)/);
+        return match ? parseInt(match[1]) : 0;
       }
     );
-    if (Math.random() > 0.5) {
-      // 50% chance to scroll
-      await randomScroll(page, Math.floor(Math.random() * 3) + 1);
-    } else {
-      await delay(page);
-    }
-    return res.status(200).json({ connections: Array.from(newConnections) });
+
+    return res.status(200).json({
+      totalInvitations,
+      listedConnections: allConnections.size,
+      connections: Array.from(allConnections).map((conn) =>
+        JSON.parse(conn as string)
+      ),
+    });
   } finally {
     await page.close();
   }
