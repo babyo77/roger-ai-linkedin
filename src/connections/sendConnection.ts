@@ -80,14 +80,14 @@ export const sendConnectionRequest = async (req: Request, res: Response) => {
       .status(400)
       .json({ message: "Message and linkedinUrl are required" });
   }
+  const page = await context.newPage();
   try {
-    const page = await context.newPage();
     await page.goto(linkedinUrl, {
       waitUntil: "domcontentloaded",
     });
     await initiateConnection(page, sendMessage);
     return res.status(200).json({ message: "Connection request sent" });
   } finally {
-    await browser.close();
+    await page.close();
   }
 };

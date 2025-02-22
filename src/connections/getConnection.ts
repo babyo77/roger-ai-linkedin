@@ -4,8 +4,8 @@ import { Request, Response } from "express";
 
 export const getConnection = async (req: Request, res: Response) => {
   const { browser, context } = await INITIALIZE_BROWSER(req);
+  const page = await context.newPage();
   try {
-    const page = await context.newPage();
     await page.goto(
       "https://www.linkedin.com/mynetwork/invitation-manager/sent/",
       {
@@ -49,6 +49,6 @@ export const getConnection = async (req: Request, res: Response) => {
 
     return res.status(200).json({ connections: Array.from(newConnections) });
   } finally {
-    await browser.close();
+    await page.close();
   }
 };
