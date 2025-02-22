@@ -27,12 +27,6 @@ export const PLAYWRIGHT_CONFIG: {
 
 export const BROWSER_CONFIG: LaunchOptions = {
   headless: true,
-  args: [
-    `--window-size=${Math.max(
-      getRandomViewport().width,
-      getRandomViewport().height
-    )},${Math.min(getRandomViewport().width, getRandomViewport().height)}`,
-  ],
   timeout: 30000,
 };
 
