@@ -4,66 +4,69 @@ import { Request, Response } from "express";
 import { INITIALIZE_BROWSER } from "../playwright.config";
 
 const initiateConnection = async (page: Page, message: string) => {
-  //   await randomDelay();
-
-  //   await delay(page);
+  await delay(page);
   try {
-    let connect = await page.locator(
-      "xpath=/html/body/div[6]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/button"
-    );
+    const moreButton = await page
+      .getByRole("button", { name: "More actions" })
+      .first();
 
-    connect = await page.locator(
-      "xpath=/html/body/div[6]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/div[2]"
-    );
-
-    connect = await page.locator(
-      "xpath=/html/body/div[6]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/div[2]"
-    );
-    await connect?.hover();
+    console.log("more button found");
+    await moreButton?.click();
+    console.log("more button clicked");
     await delay(page);
-    await connect?.click();
+
+    // Find and click Connect option
+    const connectButton = await page
+      .locator("div.artdeco-dropdown__item", {
+        hasText: "Connect",
+      })
+      .nth(1);
+    console.log("connect button found");
+    await connectButton?.click().catch((error) => {
+      console.log(error);
+    });
+
+    // Wait for and click "Add a note" button
+    const addNoteButton = await page
+      .getByRole("button", {
+        name: "Send without a note",
+      })
+      .first();
+
+    console.log("add note button found");
+    await addNoteButton?.hover();
+    console.log("add note button hovered");
+    await delay(page);
+    console.log("delay done");
+    await addNoteButton?.click();
+
+    //   // Sometimes scroll slightly before typing
+    //   await randomScroll(page);
+    //   await randomDelay();
+
+    // // Type message with human-like delays
+    // const messageInput = await page.locator(
+    //   "xpath=/html/body/div[4]/div/div/div[3]/div[1]/textarea"
+    // );
+    // console.log("message input found");
+    // await messageInput?.click();
+    // console.log("message input clicked");
+    // // Paste the entire message at once, more natural than character-by-character
+    // await messageInput?.fill(message);
+    // console.log("message input filled");
+    // // Click send button
+    // const sendButton = await page.locator(
+    //   "xpath=/html/body/div[4]/div/div/div[4]/button[2]"
+    // );
+    // console.log("send button found");
+    // await sendButton?.hover();
+    // console.log("send button hovered");
+    // await delay(page);
+    // console.log("delay done");
+    // await sendButton?.click();
   } catch (error) {
     throw new Error("Connect button not found");
   }
-  // Find and click Connect option
-  const connectButton = await page.locator(
-    "xpath=/html/body/div[6]/div[3]/div/div/div[2]/div/div/main/section[1]/div[2]/div[3]/div/div[2]/div/div/ul/li[3]"
-  );
-  await connectButton?.hover();
-  await delay(page);
-  await connectButton?.click();
-
-  // Wait for and click "Add a note" button
-  const addNoteButton = await page.locator(
-    "xpath=/html/body/div[4]/div/div/div[3]/button[1]"
-  );
-  await addNoteButton?.hover();
-  await delay(page);
-  await addNoteButton?.click();
-
-  //   // Sometimes scroll slightly before typing
-  //   await randomScroll(page);
-  //   await randomDelay();
-
-  // Type message with human-like delays
-  const messageInput = await page.locator(
-    "xpath=/html/body/div[4]/div/div/div[3]/div[1]/textarea"
-  );
-  await messageInput?.click();
-
-  // Paste the entire message at once, more natural than character-by-character
-  await messageInput?.fill(message);
-
-  // Wait a bit before clicking send
-  await delay(page);
-
-  // Click send button
-  const sendButton = await page.locator(
-    "xpath=/html/body/div[4]/div/div/div[4]/button[2]"
-  );
-  await sendButton?.hover();
-  await delay(page);
-  await sendButton?.click();
 };
 
 export const sendConnectionRequest = async (req: Request, res: Response) => {

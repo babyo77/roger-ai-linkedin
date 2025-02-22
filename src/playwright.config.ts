@@ -21,7 +21,7 @@ export const PLAYWRIGHT_CONFIG: {
 };
 
 export const BROWSER_CONFIG = {
-  headless: false,
+  headless: true,
   args: [
     "--no-sandbox",
     "--disable-setuid-sandbox",
@@ -30,7 +30,10 @@ export const BROWSER_CONFIG = {
     "--disable-blink-features=AutomationControlled",
     "--enable-webgl",
     "--window-position=0,0",
-    `--window-size=${getRandomViewport().width},${getRandomViewport().height}`,
+    `--window-size=${Math.max(
+      getRandomViewport().width,
+      getRandomViewport().height
+    )},${Math.min(getRandomViewport().width, getRandomViewport().height)}`,
   ],
   ignoreDefaultArgs: [
     "--enable-automation",
@@ -42,11 +45,9 @@ export const BROWSER_CONFIG = {
     "media.navigator.enabled": false,
     "network.http.referer.spoofSource": true,
     "privacy.resistFingerprinting": true,
-    "network.http.connection-timeout": 30,
     "network.http.max-connections": 100,
     "general.useragent.override": getRandomUserAgent(),
     "javascript.enabled": true,
-    "permissions.default.image": 1,
   },
   timeout: 30000,
 };
@@ -65,10 +66,11 @@ export const INITIALIZE_BROWSER = async (req: Request) => {
     activeBrowser = await firefox.launch(BROWSER_CONFIG);
   }
 
-  // Create a new context with fresh cookies for each request
+  // Create a new context with fresh cookies for each request in private browsing mode
   const context = await activeBrowser.newContext({
     ...PLAYWRIGHT_CONFIG,
     storageState: undefined, // Ensure clean state for each context
+    userAgent: getRandomUserAgent(), // Fresh user agent for private browsing
   });
 
   // Set up context with request-specific cookies
@@ -84,12 +86,7 @@ async function setupContext(context: BrowserContext, token: string) {
       Object.defineProperty(navigator, "webdriver", {
         get: () => undefined,
       });
-      Object.defineProperty(navigator, "plugins", {
-        get: () => [1, 2, 3, 4, 5],
-      });
-      Object.defineProperty(navigator, "languages", {
-        get: () => ["en-US", "en"],
-      });
+
       const originalQuery = window.navigator.permissions.query;
       // @ts-ignore - We know this implementation is incomplete but it's sufficient for our needs
       window.navigator.permissions.query = (parameters: any) =>
@@ -110,3 +107,7 @@ async function setupContext(context: BrowserContext, token: string) {
     ]),
   ]);
 }
+
+(async () => {
+  activeBrowser = await firefox.launch(BROWSER_CONFIG);
+})();

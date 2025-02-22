@@ -20,8 +20,8 @@ interface Viewport {
 }
 
 function getRandomViewport(): Viewport {
-  const widths: number[] = [1280, 1366, 1440, 1536, 1600, 1920];
-  const heights: number[] = [720, 768, 810, 900, 1080, 1200];
+  const widths: number[] = [1280, 1366, 1440, 1536, 1600, 1920, 2048, 2560];
+  const heights: number[] = [720, 768, 810, 900, 1080, 1200, 1440];
 
   return {
     width: widths[Math.floor(Math.random() * widths.length)],

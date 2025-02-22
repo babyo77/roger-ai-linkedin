@@ -15,13 +15,17 @@ export const getUser = async (req: Request, res: Response) => {
 
     // await randomMouseMove(page);
 
-    const name = await page.$$eval(
-      `.qZFEXrBJHDYjFOoIqDzEzysWCmDTGIoKr`,
-      (elements) => elements[0].textContent?.trim()
-    );
+    const nameElement = await page
+      .locator(
+        ".artdeco-hoverable-trigger.artdeco-hoverable-trigger--content-placed-bottom"
+      )
+      .first()
+      .textContent();
+
+    const name = nameElement?.trim().replace(/\s+/g, " ").trim();
 
     if (!name) {
-      throw new AppError("Failed to fetch LinkedIn profile", 500);
+      throw new AppError("Failed to fetch LinkedIn profile name", 500);
     }
     // await randomDelay();
 
