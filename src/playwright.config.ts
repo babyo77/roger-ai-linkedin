@@ -53,6 +53,7 @@ export const BROWSER_CONFIG = {
 };
 
 let activeBrowser: FirefoxBrowser | null = null;
+let isInitializing = false;
 
 export const INITIALIZE_BROWSER = async (req: Request) => {
   const token = req.query.token || req.headers["li_at"];
@@ -61,22 +62,33 @@ export const INITIALIZE_BROWSER = async (req: Request) => {
     throw new AppError("Token is required", 400);
   }
 
-  // Launch browser if it doesn't exist or is disconnected
-  if (!activeBrowser || !activeBrowser.isConnected()) {
-    activeBrowser = await firefox.launch(BROWSER_CONFIG);
+  // If another request is initializing, wait for a short delay
+  while (isInitializing) {
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 second delay
   }
 
-  // Create a new context with fresh cookies for each request in private browsing mode
-  const context = await activeBrowser.newContext({
-    ...PLAYWRIGHT_CONFIG,
-    storageState: undefined, // Ensure clean state for each context
-    userAgent: getRandomUserAgent(), // Fresh user agent for private browsing
-  });
+  try {
+    isInitializing = true;
 
-  // Set up context with request-specific cookies
-  await setupContext(context, token);
+    // Launch browser if it doesn't exist or is disconnected
+    if (!activeBrowser || !activeBrowser.isConnected()) {
+      activeBrowser = await firefox.launch(BROWSER_CONFIG);
+    }
 
-  return { browser: activeBrowser, context };
+    // Create a new context with fresh cookies for each request in private browsing mode
+    const context = await activeBrowser.newContext({
+      ...PLAYWRIGHT_CONFIG,
+      storageState: undefined,
+      userAgent: getRandomUserAgent(),
+    });
+
+    // Set up context with request-specific cookies
+    await setupContext(context, token);
+
+    return { browser: activeBrowser, context };
+  } finally {
+    isInitializing = false;
+  }
 };
 
 // Helper function to setup context
