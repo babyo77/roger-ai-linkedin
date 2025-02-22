@@ -28,23 +28,12 @@ export const PLAYWRIGHT_CONFIG: {
 export const BROWSER_CONFIG: LaunchOptions = {
   headless: true,
   args: [
-    "--no-sandbox",
-    "--disable-setuid-sandbox",
-    "--disable-dev-shm-usage",
     "--disable-gpu",
-    "--disable-blink-features=AutomationControlled",
-    "--enable-webgl",
     "--window-position=0,0",
-    "--use-gl=swiftshader",
-    "--enable-accelerated-2d-canvas",
     `--window-size=${Math.max(
       getRandomViewport().width,
       getRandomViewport().height
     )},${Math.min(getRandomViewport().width, getRandomViewport().height)}`,
-  ],
-  ignoreDefaultArgs: [
-    "--enable-automation",
-    "--enable-blink-features=AutomationControlled",
   ],
   timeout: 30000,
 };
