@@ -4,11 +4,13 @@ import { Request, Response } from "express";
 import { INITIALIZE_BROWSER } from "../playwright.config";
 
 const initiateConnection = async (page: Page, message: string) => {
+  await delay(page);
   try {
     const messageButton = page
       .locator('button:has(span.artdeco-button__text:text("Connect"))')
       .nth(1);
     try {
+      await messageButton.isEnabled();
       await messageButton.hover();
       await messageButton.click();
     } catch (error) {
@@ -41,6 +43,8 @@ const initiateConnection = async (page: Page, message: string) => {
     console.log("add note button found");
     await addNoteButton?.hover();
     console.log("add note button hovered");
+    await delay(page);
+    console.log("delay done");
     await addNoteButton?.click();
   } catch (error) {
     throw new Error("Connection request already pending");
@@ -69,7 +73,6 @@ export const sendConnectionRequest = async (req: Request, res: Response) => {
     await initiateConnection(page, sendMessage);
     return res.status(200).json({ message: "Connection request sent" });
   } finally {
-    await delay(page);
     await page.close();
   }
 };
