@@ -1,32 +1,39 @@
 import { Page } from "playwright";
-import { randomScroll, randomDelay, delay } from "../helper";
+import { delay } from "../helper";
 import { Request, Response } from "express";
 import { INITIALIZE_BROWSER } from "../playwright.config";
 
 const initiateConnection = async (page: Page, message: string) => {
   await delay(page);
   try {
-    const moreButton = await page
-      .getByRole("button", { name: "More actions" })
-      .first();
-
-    console.log("more button found");
-    await moreButton?.click();
-    console.log("more button clicked");
-    await delay(page);
-
-    // Find and click Connect option
-    const connectButton = await page
-      .locator("div.artdeco-dropdown__item", {
-        hasText: "Connect",
-      })
+    const messageButton = page
+      .locator('button:has(span.artdeco-button__text:text("Connect"))')
       .nth(1);
-    console.log("connect button found");
-    await connectButton?.click().catch((error) => {
-      console.log(error);
-    });
+    try {
+      await messageButton.isEnabled();
+      await messageButton.hover();
+      await messageButton.click();
+    } catch (error) {
+      const moreButton = await page
+        .getByRole("button", { name: "More actions" })
+        .first();
 
-    // Wait for and click "Add a note" button
+      console.log("more button found");
+      await moreButton?.click();
+      console.log("more button clicked");
+      await delay(page);
+      // Find and click Connect option
+      const connectButton = await page
+        .locator("div.artdeco-dropdown__item", {
+          hasText: "Connect",
+        })
+        .nth(1);
+      console.log("connect button found");
+      await connectButton?.click().catch((error) => {
+        console.log(error);
+      });
+    }
+
     const addNoteButton = await page
       .getByRole("button", {
         name: "Send without a note",
