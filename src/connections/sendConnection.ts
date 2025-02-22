@@ -43,8 +43,6 @@ const initiateConnection = async (page: Page, message: string) => {
     console.log("add note button found");
     await addNoteButton?.hover();
     console.log("add note button hovered");
-    await delay(page);
-    console.log("delay done");
     await addNoteButton?.click();
   } catch (error) {
     throw new Error("Connection request already pending");
