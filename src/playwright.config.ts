@@ -35,6 +35,11 @@ let isInitializing = false;
 
 export const INITIALIZE_BROWSER = async (req: Request) => {
   const token = req.query.token || req.headers["li_at"];
+  const userIP = (req.headers["x-forwarded-for"] || req.ip || "")
+    .toString()
+    .replace(/^::ffff:|^::1:|^::/, "") // Remove all common IPv6 prefixes
+    .split(",")[0] // Take first IP if multiple
+    .trim();
 
   if (!token || typeof token !== "string") {
     throw new AppError("Token is required", 400);
@@ -58,6 +63,9 @@ export const INITIALIZE_BROWSER = async (req: Request) => {
       ...PLAYWRIGHT_CONFIG,
       storageState: undefined,
       userAgent: getRandomUserAgent(),
+      extraHTTPHeaders: {
+        "X-Forwarded-For": userIP,
+      },
     });
 
     // Set up context with request-specific cookies
