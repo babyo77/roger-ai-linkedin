@@ -13,40 +13,58 @@ export const getConnection = async (req: Request, res: Response) => {
       }
     );
 
-    // await Promise.allSettled([
-    //   (async () => {
-    //     await randomMouseMove(page);
-    //     if (Math.random() > 0.7) {
-    //       await page.hover(".invitation-card__picture");
-    //     }
-    //   })(),
-    //   (async () => {
-    //     await randomScroll(page);
-    //   })(),
-    // ]);
-
-    // await delay(page);
-
-    const newConnections = await page.$$eval(".invitation-card", (cards) => {
-      return cards.map((card) => {
-        const name =
-          card
-            .querySelector(".invitation-card__tvm-title")
-            ?.textContent?.trim()
-            ?.split("\n")[0]
-            ?.trim() || "";
-        const status =
-          card.querySelector(".artdeco-button__text")?.textContent?.trim() ||
-          "";
-        // const imageUrl =
-        //   card
-        //     .querySelector(".invitation-card__picture img")
-        //     ?.getAttribute("src") || "";
-        return { name, status };
-      });
+    await page.waitForSelector(".artdeco-list .invitation-card", {
+      timeout: 10000,
     });
-    // await randomScroll(page);
 
+    const newConnections = await page.$$eval(
+      ".artdeco-list .invitation-card",
+      (cards) => {
+        return cards.map((card) => {
+          // Get name - handle nested strong/a tags
+          const nameElement = card.querySelector(
+            ".invitation-card__tvm-title strong a"
+          );
+          const name = nameElement?.textContent?.trim() || "";
+
+          // Get status from the withdraw button
+          const status =
+            card.querySelector(".artdeco-button__text")?.textContent?.trim() ||
+            "";
+
+          // Get profile link
+          const profileLink =
+            card
+              .querySelector(".invitation-card__picture")
+              ?.getAttribute("href") || "";
+
+          // Get subtitle with cleaner text
+          const subtitle =
+            card
+              .querySelector(".invitation-card__subtitle")
+              ?.textContent?.replace(/<!---->|<!---->/g, "")
+              ?.trim() || "";
+
+          // Get time sent
+          const timeSent =
+            card.querySelector(".time-badge")?.textContent?.trim() || "";
+
+          return {
+            name,
+            status,
+            profileLink,
+            subtitle,
+            timeSent,
+          };
+        });
+      }
+    );
+    if (Math.random() > 0.5) {
+      // 50% chance to scroll
+      await randomScroll(page, Math.floor(Math.random() * 3) + 1);
+    } else {
+      await delay(page);
+    }
     return res.status(200).json({ connections: Array.from(newConnections) });
   } finally {
     await page.close();

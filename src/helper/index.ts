@@ -109,24 +109,47 @@ const randomMouseMove = async (page: Page) => {
   }
 };
 
-const randomScroll = async (page: Page) => {
+const randomScroll = async (page: Page, number: number) => {
   // Get the total scrollable height of the page
   const scrollHeight = await page.evaluate(() => document.body.scrollHeight);
 
-  // Generate a random number of scroll steps (between 2 and 5)
-  const steps = Math.floor(Math.random() * 4) + 2;
+  const sequences = number || Math.floor(Math.random() * 5) + 3;
 
-  for (let i = 0; i < steps; i++) {
-    // Generate a random scroll amount
-    const scrollAmount = Math.floor(Math.random() * (scrollHeight / 5)) + 100; // Scroll 100px - 20% of page height
+  for (let i = 0; i < sequences; i++) {
+    // Randomly decide scroll direction (70% chance to scroll down)
+    const scrollDown = Math.random() < 0.7;
 
-    // Scroll smoothly
-    await page.evaluate((scrollBy: number) => {
-      window.scrollBy({ top: scrollBy, behavior: "smooth" });
-    }, scrollAmount);
+    // Generate smaller scroll amounts for more natural movement
+    // Between 100px and 15% of page height
+    const scrollAmount =
+      Math.floor(Math.random() * (scrollHeight * 0.15)) + 100;
+    const finalAmount = scrollDown ? scrollAmount : -scrollAmount;
 
-    // Wait for a random delay between scrolls (200ms - 1s)
-    await page.waitForTimeout(Math.floor(Math.random() * 800) + 200);
+    // Scroll with variable speed (slower for upward scrolls)
+    const scrollDuration = scrollDown
+      ? Math.floor(Math.random() * 500) + 500 // 500-1000ms for downward
+      : Math.floor(Math.random() * 800) + 800; // 800-1600ms for upward
+
+    // Smooth scroll with custom duration
+    await page.evaluate(
+      ({ scrollBy, duration }) => {
+        return new Promise((resolve) => {
+          window.scrollBy({
+            top: scrollBy,
+            behavior: "smooth",
+          });
+          setTimeout(resolve, duration);
+        });
+      },
+      { scrollBy: finalAmount, duration: scrollDuration }
+    );
+
+    // Occasionally pause longer (30% chance) to simulate reading
+    if (Math.random() < 0.3) {
+      await page.waitForTimeout(Math.floor(Math.random() * 2000) + 1000); // 1-3s pause
+    } else {
+      await page.waitForTimeout(Math.floor(Math.random() * 500) + 200); // 200-700ms normal delay
+    }
   }
 };
 

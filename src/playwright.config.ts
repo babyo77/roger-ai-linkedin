@@ -1,4 +1,9 @@
-import { BrowserContext, firefox, FirefoxBrowser } from "playwright";
+import {
+  BrowserContext,
+  webkit,
+  FirefoxBrowser,
+  LaunchOptions,
+} from "playwright";
 import { getRandomUserAgent } from "./helper";
 import { getRandomViewport } from "./helper";
 import { AppError } from "./middleware/asyncHandler";
@@ -20,7 +25,7 @@ export const PLAYWRIGHT_CONFIG: {
   reducedMotion: "no-preference",
 };
 
-export const BROWSER_CONFIG = {
+export const BROWSER_CONFIG: LaunchOptions = {
   headless: true,
   args: [
     "--no-sandbox",
@@ -30,6 +35,8 @@ export const BROWSER_CONFIG = {
     "--disable-blink-features=AutomationControlled",
     "--enable-webgl",
     "--window-position=0,0",
+    "--use-gl=swiftshader",
+    "--enable-accelerated-2d-canvas",
     `--window-size=${Math.max(
       getRandomViewport().width,
       getRandomViewport().height
@@ -39,16 +46,6 @@ export const BROWSER_CONFIG = {
     "--enable-automation",
     "--enable-blink-features=AutomationControlled",
   ],
-  ignoreHTTPSErrors: true,
-  firefoxUserPrefs: {
-    "dom.webdriver.enabled": false,
-    "media.navigator.enabled": false,
-    "network.http.referer.spoofSource": true,
-    "privacy.resistFingerprinting": true,
-    "network.http.max-connections": 100,
-    "general.useragent.override": getRandomUserAgent(),
-    "javascript.enabled": true,
-  },
   timeout: 30000,
 };
 
@@ -72,7 +69,7 @@ export const INITIALIZE_BROWSER = async (req: Request) => {
 
     // Launch browser if it doesn't exist or is disconnected
     if (!activeBrowser || !activeBrowser.isConnected()) {
-      activeBrowser = await firefox.launch(BROWSER_CONFIG);
+      activeBrowser = await webkit.launch(BROWSER_CONFIG);
     }
 
     // Create a new context with fresh cookies for each request in private browsing mode
@@ -121,5 +118,5 @@ async function setupContext(context: BrowserContext, token: string) {
 }
 
 (async () => {
-  activeBrowser = await firefox.launch(BROWSER_CONFIG);
+  activeBrowser = await webkit.launch(BROWSER_CONFIG);
 })();
