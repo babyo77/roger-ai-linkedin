@@ -4,21 +4,16 @@ import {
   FirefoxBrowser,
   LaunchOptions,
 } from "playwright";
-import { getRandomUserAgent } from "./helper";
-import { getRandomViewport } from "./helper";
 import { AppError } from "./middleware/asyncHandler";
 import { Request } from "express";
+import { getRandomUserAgent } from "./helper";
 
 export const PLAYWRIGHT_CONFIG: {
-  userAgent: string;
-  // viewport: { width: number; height: number };
   deviceScaleFactor: number;
   colorScheme: "dark" | "light";
   reducedMotion: "reduce" | "no-preference";
   isMobile: boolean;
 } = {
-  userAgent: getRandomUserAgent(),
-  // viewport: getRandomViewport(),
   isMobile: false,
   deviceScaleFactor: Math.random() * (2 - 1) + 1,
   colorScheme: Math.random() > 0.5 ? "dark" : "light",
@@ -62,7 +57,7 @@ export const INITIALIZE_BROWSER = async (req: Request) => {
     const context = await activeBrowser.newContext({
       ...PLAYWRIGHT_CONFIG,
       storageState: undefined,
-      userAgent: getRandomUserAgent(),
+      userAgent: req.headers["user-agent"] || getRandomUserAgent(),
       extraHTTPHeaders: {
         "X-Forwarded-For": userIP,
       },

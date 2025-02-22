@@ -17,8 +17,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "playwright": "^1.50.1",
-    "playwright-extra": "^4.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "redis": "^4.7.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

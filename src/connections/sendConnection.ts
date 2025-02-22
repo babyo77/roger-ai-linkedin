@@ -39,33 +39,8 @@ const initiateConnection = async (page: Page, message: string) => {
     await delay(page);
     console.log("delay done");
     await addNoteButton?.click();
-
-    //   // Sometimes scroll slightly before typing
-    //   await randomScroll(page);
-    //   await randomDelay();
-
-    // // Type message with human-like delays
-    // const messageInput = await page.locator(
-    //   "xpath=/html/body/div[4]/div/div/div[3]/div[1]/textarea"
-    // );
-    // console.log("message input found");
-    // await messageInput?.click();
-    // console.log("message input clicked");
-    // // Paste the entire message at once, more natural than character-by-character
-    // await messageInput?.fill(message);
-    // console.log("message input filled");
-    // // Click send button
-    // const sendButton = await page.locator(
-    //   "xpath=/html/body/div[4]/div/div/div[4]/button[2]"
-    // );
-    // console.log("send button found");
-    // await sendButton?.hover();
-    // console.log("send button hovered");
-    // await delay(page);
-    // console.log("delay done");
-    // await sendButton?.click();
   } catch (error) {
-    throw new Error("Connect button not found");
+    throw new Error("Connection request already pending");
   }
 };
 

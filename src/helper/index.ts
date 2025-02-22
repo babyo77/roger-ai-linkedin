@@ -109,7 +109,7 @@ const randomMouseMove = async (page: Page) => {
   }
 };
 
-const randomScroll = async (page: Page, number: number) => {
+const randomScroll = async (page: Page, number?: number) => {
   // Get the total scrollable height of the page
   const scrollHeight = await page.evaluate(() => document.body.scrollHeight);
 
