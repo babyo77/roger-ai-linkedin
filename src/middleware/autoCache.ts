@@ -9,7 +9,7 @@ const DEFAULT_CACHE_DURATION = 3600; // 1 hour default
 const CACHE_CONFIG: CacheConfig = {
   "/api/connections": 3600, // 1 hour
   "/api/me": 3600, // 1 hour
-  "/api/send-connection": 3600, // 1 hour
+  "/api/send-connection": 1814400, // 1 hour
   "/api/send-message": 3600, // 1 hour
 };
 
