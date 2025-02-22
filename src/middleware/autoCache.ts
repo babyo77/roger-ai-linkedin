@@ -23,6 +23,7 @@ export const autoCacheMiddleware = (): RequestHandler => {
     const token = req.headers["li_at"] || req.query.token;
     if (!token) {
       res.status(401).json({ message: "Unauthorized" });
+      return;
     }
 
     const queryString = Object.keys(req.query)
