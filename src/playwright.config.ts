@@ -28,8 +28,6 @@ export const PLAYWRIGHT_CONFIG: {
 export const BROWSER_CONFIG: LaunchOptions = {
   headless: true,
   args: [
-    "--disable-gpu",
-    "--window-position=0,0",
     `--window-size=${Math.max(
       getRandomViewport().width,
       getRandomViewport().height
