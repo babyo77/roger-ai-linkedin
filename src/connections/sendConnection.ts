@@ -6,33 +6,41 @@ import { INITIALIZE_BROWSER } from "../playwright.config";
 const initiateConnection = async (page: Page, message: string) => {
   try {
     const messageButton = page
-      .locator('button:has(span:text("Connect"))')
+      .locator('button:has(span.artdeco-button__text:text("Connect"))')
       .nth(1);
     try {
-      await Promise.all([
-        messageButton.click(),
-        page.waitForResponse((response) => response.url().includes("connect")),
-      ]);
+      await messageButton.hover();
+      await messageButton.click();
     } catch (error) {
-      const moreButton = page
+      const moreButton = await page
         .getByRole("button", { name: "More actions" })
         .first();
-      await moreButton?.click();
 
-      const connectButton = page
+      console.log("more button found");
+      await moreButton?.click();
+      console.log("more button clicked");
+      await delay(page);
+      // Find and click Connect option
+      const connectButton = await page
         .locator("div.artdeco-dropdown__item", {
           hasText: "Connect",
         })
         .nth(1);
-      await connectButton?.click();
+      console.log("connect button found");
+      await connectButton?.click().catch((error) => {
+        console.log(error);
+      });
     }
 
-    const addNoteButton = page
+    const addNoteButton = await page
       .getByRole("button", {
         name: "Send without a note",
       })
       .first();
 
+    console.log("add note button found");
+    await addNoteButton?.hover();
+    console.log("add note button hovered");
     await addNoteButton?.click();
   } catch (error) {
     throw new Error("Connection request already pending");
@@ -55,13 +63,13 @@ export const sendConnectionRequest = async (req: Request, res: Response) => {
   }
   const page = await context.newPage();
   try {
-    await Promise.all([
-      page.goto(linkedinUrl),
-      page.waitForLoadState("domcontentloaded"),
-    ]);
+    await page.goto(linkedinUrl, {
+      waitUntil: "domcontentloaded",
+    });
     await initiateConnection(page, sendMessage);
     return res.status(200).json({ message: "Connection request sent" });
   } finally {
+    await delay(page);
     await page.close();
   }
 };
