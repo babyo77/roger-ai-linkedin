@@ -55,7 +55,7 @@ export const BROWSER_CONFIG = {
 let activeBrowser: FirefoxBrowser | null = null;
 
 export const INITIALIZE_BROWSER = async (req: Request) => {
-  const token = req.headers["li_at"];
+  const token = req.query.token || req.headers["li_at"];
 
   if (!token || typeof token !== "string") {
     throw new AppError("Token is required", 400);
