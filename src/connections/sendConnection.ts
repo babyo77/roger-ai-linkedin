@@ -9,7 +9,6 @@ const initiateConnection = async (page: Page, message: string) => {
       .locator('button:has(span.artdeco-button__text:text("Connect"))')
       .nth(1);
     try {
-      await messageButton.isEnabled();
       await messageButton.hover();
       await messageButton.click();
     } catch (error) {
