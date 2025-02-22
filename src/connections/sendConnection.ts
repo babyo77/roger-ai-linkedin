@@ -69,6 +69,7 @@ export const sendConnectionRequest = async (req: Request, res: Response) => {
     await initiateConnection(page, sendMessage);
     return res.status(200).json({ message: "Connection request sent" });
   } finally {
+    await delay(page);
     await page.close();
   }
 };
