@@ -4,7 +4,6 @@ import { Request, Response } from "express";
 import { INITIALIZE_BROWSER } from "../playwright.config";
 
 const initiateConnection = async (page: Page, message: string) => {
-  await delay(page);
   try {
     const messageButton = page
       .locator('button:has(span.artdeco-button__text:text("Connect"))')
