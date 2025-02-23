@@ -11,9 +11,13 @@ export const getUser = async (req: Request, res: Response) => {
   const page = await context.newPage();
 
   try {
-    await page.goto("https://www.linkedin.com/in/", {
-      waitUntil: "domcontentloaded",
-    });
+    await page.goto("https://www.linkedin.com/in/");
+    await page.waitForTimeout(5000);
+    const screenshot = await page.screenshot({ fullPage: false });
+
+    res.setHeader("Content-Type", "image/png");
+    return res.send(screenshot);
+
     await delay(page);
     const [nameElement, imageUrl] = await Promise.all([
       page
@@ -33,11 +37,7 @@ export const getUser = async (req: Request, res: Response) => {
     await delay(page);
     return res.status(200).json({ name, profileImage: imageUrl });
   } catch (error: any) {
-    // Take screenshot before throwing error
-    const screenshot = await page.screenshot({ fullPage: false });
-
-    res.setHeader("Content-Type", "image/png");
-    return res.send(screenshot);
+    throw new AppError(error.message, 500);
   } finally {
     await page.close();
   }
