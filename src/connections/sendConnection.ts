@@ -63,9 +63,7 @@ export const sendConnectionRequest = async (req: Request, res: Response) => {
   }
   const page = await context.newPage();
   try {
-    await page.goto(linkedinUrl, {
-      waitUntil: "domcontentloaded",
-    });
+    await page.goto(linkedinUrl);
     await initiateConnection(page, sendMessage);
     return res.status(200).json({ message: "Connection request sent" });
   } finally {
