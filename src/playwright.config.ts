@@ -30,46 +30,29 @@ let context: BrowserContext | null = null;
 let isInitializing = false;
 
 export const INITIALIZE_BROWSER = async (req: Request) => {
-  const token = req.query.token || req.headers["li_at"];
-  const userIP = (req.headers["x-forwarded-for"] || req.ip || "")
-    .toString()
-    .replace(/^::ffff:|^::1:|^::/, "") // Remove all common IPv6 prefixes
-    .split(",")[0] // Take first IP if multiple
-    .trim();
-
-  if (!token || typeof token !== "string") {
-    throw new AppError("Token is required", 400);
+  if (isInitializing) {
+    console.log("Waiting for initialization...");
+    while (isInitializing) {
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Shorter delay
+    }
   }
 
-  // If another request is initializing, wait for a short delay
-  while (isInitializing) {
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 second delay
+  if (activeBrowser?.isConnected() && context) {
+    await setupContext(context, req.query.token as string);
+    return { browser: activeBrowser, context };
   }
 
   try {
     isInitializing = true;
+    activeBrowser?.close(); // Close old instance if any
+    console.log("Launching new browser...");
+    activeBrowser = await webkit.launch(BROWSER_CONFIG);
 
-    // Launch browser if it doesn't exist or is disconnected
-    if (!activeBrowser || !activeBrowser.isConnected()) {
-      activeBrowser?.close();
-      console.log("Browser closed");
-      activeBrowser = await webkit.launch(BROWSER_CONFIG);
-      console.log("Browser launched 2");
-    }
-    if (!context) {
-      // Create a new context with fresh cookies for each request in private browsing mode
-      context = await activeBrowser.newContext({
-        ...PLAYWRIGHT_CONFIG,
-        storageState: undefined,
-        userAgent: req.headers["user-agent"] || getRandomUserAgent(),
-        // extraHTTPHeaders: {
-        //   "X-Forwarded-For": userIP,
-        // },
-      });
+    context = await activeBrowser.newContext({
+      ...PLAYWRIGHT_CONFIG,
+      userAgent: req.headers["user-agent"] || getRandomUserAgent(),
+    });
 
-      // Set up context with request-specific cookies
-      await setupContext(context, token);
-    }
     return { browser: activeBrowser, context };
   } finally {
     isInitializing = false;
