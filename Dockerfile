@@ -10,9 +10,6 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Install Playwright browsers and dependencies
-RUN npx playwright install --with-deps
-
 # Copy TypeScript config and source code
 COPY tsconfig.json ./
 COPY src/ ./src/
