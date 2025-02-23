@@ -22,7 +22,7 @@ export const PLAYWRIGHT_CONFIG: {
 
 export const BROWSER_CONFIG: LaunchOptions = {
   headless: true,
-  timeout: 30000,
+  timeout: 20000,
 };
 
 let activeBrowser: FirefoxBrowser | null = null;
@@ -50,6 +50,8 @@ export const INITIALIZE_BROWSER = async (req: Request) => {
 
     // Launch browser if it doesn't exist or is disconnected
     if (!activeBrowser || !activeBrowser.isConnected()) {
+      activeBrowser?.close();
+
       activeBrowser = await webkit.launch(BROWSER_CONFIG);
     }
 
