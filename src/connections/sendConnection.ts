@@ -9,7 +9,6 @@ const initiateConnection = async (page: Page, message: string) => {
       .locator('button:has(span.artdeco-button__text:text("Connect"))')
       .nth(1);
     try {
-      await messageButton.hover();
       await messageButton.click();
     } catch (error) {
       const moreButton = await page
@@ -19,7 +18,7 @@ const initiateConnection = async (page: Page, message: string) => {
       console.log("more button found");
       await moreButton?.click();
       console.log("more button clicked");
-      await delay(page);
+
       // Find and click Connect option
       const connectButton = await page
         .locator("div.artdeco-dropdown__item", {
@@ -38,8 +37,6 @@ const initiateConnection = async (page: Page, message: string) => {
       })
       .first();
 
-    console.log("add note button found");
-    await addNoteButton?.hover();
     console.log("add note button hovered");
     await addNoteButton?.click();
   } catch (error) {
@@ -48,7 +45,7 @@ const initiateConnection = async (page: Page, message: string) => {
 };
 
 export const sendConnectionRequest = async (req: Request, res: Response) => {
-  const { browser, context } = await INITIALIZE_BROWSER(req);
+  const { context } = await INITIALIZE_BROWSER(req);
   const sendMessage = req.query.message;
   const linkedinUrl = req.query.linkedinUrl;
   if (
@@ -63,9 +60,7 @@ export const sendConnectionRequest = async (req: Request, res: Response) => {
   }
   const page = await context.newPage();
   try {
-    await page.goto(linkedinUrl, {
-      waitUntil: "domcontentloaded",
-    });
+    await page.goto(linkedinUrl);
     await initiateConnection(page, sendMessage);
     return res.status(200).json({ message: "Connection request sent" });
   } finally {
