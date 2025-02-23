@@ -9,7 +9,7 @@ import { sendMessage } from "../message/sendMessage";
 const router = Router();
 
 router.get("/check-ip", checkIP);
-router.get("/me", asyncHandler(getUser));
+router.get("/user", asyncHandler(getUser));
 router.get("/connections", asyncHandler(getConnection));
 router.get("/send-connection", asyncHandler(sendConnectionRequest));
 router.get("/send-message", asyncHandler(sendMessage));

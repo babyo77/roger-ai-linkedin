@@ -9,29 +9,26 @@ export const getUser = async (req: Request, res: Response) => {
   const { context } = await INITIALIZE_BROWSER(req);
 
   const page = await context.newPage();
-
+  const url = req.query.url as string;
+  if (!url) {
+    return res.status(400).json({ message: "URL is required" });
+  }
   try {
-    await page.goto("https://www.linkedin.com/in/", {
-      waitUntil: "domcontentloaded",
-    });
-    await delay(page);
-    const [nameElement, imageUrl] = await Promise.all([
-      page
-        .locator(
-          ".artdeco-hoverable-trigger.artdeco-hoverable-trigger--content-placed-bottom"
-        )
-        .first()
-        .textContent(),
-      page.locator(".profile-photo-edit__preview").first().getAttribute("src"),
-    ]);
+    await page.goto(url);
+    await page.waitForSelector('a[href*="fsd_profile"]');
+    const link = await page.$eval(
+      'a[href*="fsd_profile"]',
+      (el: any) => el.href
+    );
 
-    const name = nameElement?.trim().replace(/\s+/g, " ").trim();
+    // Extract `fsd_profile` ID from the URL
+    const match = link.match(/fsd_profile%3A([A-Za-z0-9_-]+)/);
 
-    if (!name) {
-      throw new AppError("Failed to fetch LinkedIn profile name", 500);
+    if (match) {
+      console.log("LinkedIn Internal ID:", match[1]);
+      return res.status(200).json({ match: match[1] });
     }
-    await delay(page);
-    return res.status(200).json({ name, profileImage: imageUrl });
+    return res.status(404).json({ message: "fsd_profile ID not found" });
   } catch (error: any) {
     throw new AppError(error.message, 500);
   } finally {
