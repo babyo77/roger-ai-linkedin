@@ -22,7 +22,7 @@ const initiateConnection = async (page: Page) => {
       .getByRole("button", { name: "More actions" })
       .first();
     console.log("moreButton", moreButton);
-    await moreButton.click({ timeout: 1000 });
+    await moreButton.click();
     console.log("moreButton clicked");
     const connectButton = page
       .locator(
