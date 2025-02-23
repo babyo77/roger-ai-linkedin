@@ -23,7 +23,7 @@ export const sendMessage = async (req: Request, res: Response) => {
       waitUntil: "domcontentloaded",
     });
 
-    await randomScroll(page);
+    await randomScroll(page, 1);
     const messageButton = page
       .locator('button:has(span.artdeco-button__text:text("Message"))')
       .nth(1);
