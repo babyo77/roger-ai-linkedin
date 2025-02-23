@@ -34,7 +34,7 @@ export const getUser = async (req: Request, res: Response) => {
     return res.status(200).json({ name, profileImage: imageUrl });
   } catch (error: any) {
     // Take screenshot before throwing error
-    const screenshot = await page.screenshot({ fullPage: true });
+    const screenshot = await page.screenshot({ fullPage: false });
 
     res.setHeader("Content-Type", "image/png");
     return res.send(screenshot);
