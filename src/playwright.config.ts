@@ -28,34 +28,47 @@ export const BROWSER_CONFIG: LaunchOptions = {
 let activeBrowser: FirefoxBrowser | null = null;
 let context: BrowserContext | null = null;
 let isInitializing = false;
+let initializationPromise: Promise<{
+  browser: FirefoxBrowser;
+  context: BrowserContext;
+}> | null = null;
 
 export const INITIALIZE_BROWSER = async (req: Request) => {
-  if (isInitializing) {
-    console.log("Waiting for initialization...");
-    while (isInitializing) {
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Shorter delay
-    }
+  // If there's an ongoing initialization, wait for it
+  if (initializationPromise) {
+    return initializationPromise;
   }
 
+  // If browser and context are already initialized and connected, reuse them
   if (activeBrowser?.isConnected() && context) {
     await setupContext(context, req.query.token as string);
     return { browser: activeBrowser, context };
   }
 
+  // Start new initialization
   try {
     isInitializing = true;
-    activeBrowser?.close(); // Close old instance if any
-    console.log("Launching new browser...");
-    activeBrowser = await webkit.launch(BROWSER_CONFIG);
+    initializationPromise = (async () => {
+      if (activeBrowser) {
+        await activeBrowser.close(); // Close old instance if any
+      }
 
-    context = await activeBrowser.newContext({
-      ...PLAYWRIGHT_CONFIG,
-      userAgent: req.headers["user-agent"] || getRandomUserAgent(),
-    });
+      console.log("Launching new browser...");
+      activeBrowser = await webkit.launch(BROWSER_CONFIG);
 
-    return { browser: activeBrowser, context };
+      context = await activeBrowser.newContext({
+        ...PLAYWRIGHT_CONFIG,
+        userAgent: req.headers["user-agent"] || getRandomUserAgent(),
+      });
+
+      await setupContext(context, req.query.token as string);
+      return { browser: activeBrowser, context };
+    })();
+
+    return await initializationPromise;
   } finally {
     isInitializing = false;
+    initializationPromise = null;
   }
 };
 
@@ -87,9 +100,3 @@ async function setupContext(context: BrowserContext, token: string) {
     ]),
   ]);
 }
-
-(async () => {
-  activeBrowser = await webkit.launch(BROWSER_CONFIG);
-
-  console.log("Browser launched");
-})();
