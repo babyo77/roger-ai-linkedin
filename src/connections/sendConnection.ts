@@ -9,7 +9,7 @@ const initiateConnection = async (page: Page) => {
   console.log("messageButton", messageButton);
   try {
     console.log("first try");
-    await messageButton.click({ timeout: 5000 });
+    await messageButton.click();
     console.log("messageButton clicked");
   } catch (error) {
     console.log("second try");
