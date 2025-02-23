@@ -5,7 +5,7 @@ import { INITIALIZE_BROWSER } from "../playwright.config";
 const initiateConnection = async (page: Page) => {
   const messageButton = page
     .locator('button:has(span.artdeco-button__text:text("Connect"))')
-    .first();
+    .nth(1);
   console.log("messageButton", messageButton);
   try {
     console.log("first try");
