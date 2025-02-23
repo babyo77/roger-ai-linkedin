@@ -3,35 +3,33 @@ import { Request, Response } from "express";
 import { INITIALIZE_BROWSER } from "../playwright.config";
 
 const initiateConnection = async (page: Page) => {
-  const messageButton = page
-    .locator('button:has(span.artdeco-button__text:text("Connect"))')
-    .nth(1);
+  // Try primary connect button first
   try {
-    await messageButton.hover();
-    await messageButton.click();
-  } catch (error) {
     await page
       .locator('button:has(span.artdeco-button__text:text("Connect"))')
       .first()
+      .click({ timeout: 3000 }); // Add timeout for faster failure
+  } catch {
+    // Fallback to "More actions" flow
+    await page
+      .getByRole("button", { name: "More actions" })
+      .first()
       .click()
-      .catch(async () => {
-        const moreButton = page
-          .getByRole("button", { name: "More actions" })
-          .first();
-        await moreButton.click();
-        const connectButton = page
+      .then(() =>
+        page
           .locator(
             '//span[contains(@class, "display-flex") and contains(@class, "t-normal") and contains(@class, "flex-1") and text()="Connect"]'
           )
-          .nth(1);
-        await connectButton.click();
-      });
+          .first() // Use first() instead of nth(1)
+          .click()
+      );
   }
 
-  const addNoteButton = page
+  // Immediately click "Send without note" after connect button
+  await page
     .getByRole("button", { name: "Send without a note" })
-    .first();
-  await addNoteButton.click();
+    .first()
+    .click();
 };
 
 export const sendConnectionRequest = async (req: Request, res: Response) => {
