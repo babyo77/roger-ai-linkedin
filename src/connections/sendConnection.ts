@@ -5,26 +5,34 @@ import { INITIALIZE_BROWSER } from "../playwright.config";
 const initiateConnection = async (page: Page) => {
   const messageButton = page
     .locator('button:has(span.artdeco-button__text:text("Connect"))')
-    .nth(1);
+    .first();
+  console.log("messageButton", messageButton);
   try {
-    await messageButton.click();
+    console.log("first try");
+    await messageButton.click({ timeout: 1000 });
+    console.log("messageButton clicked");
   } catch (error) {
-    await page
-      .locator('button:has(span.artdeco-button__text:text("Connect"))')
-      .first()
-      .click()
-      .catch(async () => {
-        const moreButton = page
-          .getByRole("button", { name: "More actions" })
-          .first();
-        await moreButton.click();
-        const connectButton = page
-          .locator(
-            '//span[contains(@class, "display-flex") and contains(@class, "t-normal") and contains(@class, "flex-1") and text()="Connect"]'
-          )
-          .nth(1);
-        await connectButton.click();
-      });
+    console.log("second try");
+    // await page
+    //   .locator('button:has(span.artdeco-button__text:text("Connect"))')
+    //   .first()
+    //   .click()
+    //   .catch(async () => {
+    const moreButton = page
+      .getByRole("button", { name: "More actions" })
+      .first();
+    console.log("moreButton", moreButton);
+    await moreButton.click({ timeout: 1000 });
+    console.log("moreButton clicked");
+    const connectButton = page
+      .locator(
+        '//span[contains(@class, "display-flex") and contains(@class, "t-normal") and contains(@class, "flex-1") and text()="Connect"]'
+      )
+      .nth(1);
+    console.log("connectButton", connectButton);
+    await connectButton.click();
+    console.log("connectButton clicked");
+    // });
   }
 
   const addNoteButton = page
