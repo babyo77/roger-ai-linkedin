@@ -29,14 +29,16 @@ export const getUser = async (req: Request, res: Response) => {
       await page.goto(request.url, { waitUntil: "domcontentloaded" });
 
       await page.waitForSelector('a[href*="fsd_profile"]');
-      const link = await page.$eval('a[href*="fsd_profile"]', (el) => el.href);
+      const link = await page.$eval(
+        'a[href*="fsd_profile"]',
+        (el: HTMLAnchorElement) => el.href
+      );
       const match = link.match(/fsd_profile%3A([A-Za-z0-9_-]+)/);
 
       if (match) {
         console.log("LinkedIn Internal ID:", match[1]);
-        return match[1];
+        request.userData.linkedinId = match[1];
       }
-      return null;
     },
   });
   const result = await crawler.run([url]);
