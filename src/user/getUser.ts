@@ -38,9 +38,9 @@ export const getUser = async (req: Request, res: Response) => {
       if (match) {
         console.log("LinkedIn Internal ID:", match[1]);
         request.userData.linkedinId = match[1];
+        res.status(200).json({ result: match[1] });
       }
     },
   });
-  const result = await crawler.run([url]);
-  return res.status(200).json({ result });
+  await crawler.run([url]);
 };
