@@ -29,9 +29,7 @@ export const autoCacheMiddleware = (): RequestHandler => {
       .map((key) => `${key}=${req.query[key]}`)
       .join("&");
 
-    const cacheKey = queryString
-      ? `${path}:${token}:${queryString}`
-      : `${path}:${token}`;
+    const cacheKey = queryString ? `${path}${queryString}` : `${path}`;
 
     // Skip caching for specified routes or non-GET requests
     if (NO_CACHE_ROUTES.includes(path) || req.method !== "GET") {
