@@ -18,7 +18,7 @@ export const getUser = async (req: Request, res: Response) => {
       await page.context().addCookies([
         {
           name: "li_at",
-          value: req.body.token,
+          value: req.query.token as string,
           domain: ".linkedin.com",
           path: "/",
           httpOnly: true,
